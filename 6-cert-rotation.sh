@@ -80,5 +80,6 @@ while IFS=' ' read -r hostname ip_address <&3; do
     copy_certs "$ip_address" "$local_serving_dir" "$remote_serving_dir" "serving"
     copy_certs "$ip_address" "$local_serving_metrics_dir" "$remote_serving_metrics_dir" "serving-metrics"
 done
+exec 3<&-
 
 echo "Certificate rotation completed successfully for all nodes."
