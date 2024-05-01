@@ -1,6 +1,6 @@
 #!/bin/bash
 
-read -r signers_dir < "exported_vars.env" 
+read -r signers_dir < "exported_vars.env"
 
 # List of signers to extract certs and keys for
 signers=("etcd-signer" "etcd-metric-signer")
