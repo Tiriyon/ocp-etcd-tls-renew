@@ -52,5 +52,6 @@ while IFS=' ' read -r hostname ip_address <&3; do
     restore_manifests "$ip_address"
     check_control_plane "$ip_address"
 done
+exec 3<&-
 
 echo "Control plane start-up process completed for all specified nodes."
