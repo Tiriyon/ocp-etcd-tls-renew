@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # Define paths for CA certificates and their keys
+# TODO - export var from signer extrator script to populate paths
 ETCD_SIGNER_CERT="/etc/kubernetes/etcd-certs-backup-20240421/etcd-signer.crt"
 ETCD_SIGNER_KEY="/etc/kubernetes/etcd-certs-backup-20240421/etcd-signer.key"
 ETCD_METRIC_SIGNER_CERT="/etc/kubernetes/etcd-certs-backup-20240421/etcd-metric-signer.crt"
