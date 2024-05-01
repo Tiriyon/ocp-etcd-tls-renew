@@ -1,11 +1,13 @@
 #!/bin/bash
 
 # Define paths for CA certificates and their keys
-read -r signers_dir < "exported_vars.env" 
-ETCD_SIGNER_CERT="./$signers_dir/etcd-signer.crt"
-ETCD_SIGNER_KEY="./$singers_dir/etcd-signer.key"
-ETCD_METRIC_SIGNER_CERT="./$signers_dir/etcd-metric-signer.crt"
-ETCD_METRIC_SIGNER_KEY="./$signers_dir/etcd-metric-signer.key"
+read -r signers_dir < exported_vars.env
+ETCD_SIGNER_CERT="$signers_dir/etcd-signer.crt"
+ETCD_SIGNER_KEY="$signers_dir/etcd-signer.key"
+ETCD_METRIC_SIGNER_CERT="$signers_dir/etcd-metric-signer.crt"
+ETCD_METRIC_SIGNER_KEY="$signers_dir/etcd-metric-signer.key"
+
+
 
 # Define the OpenSSL config file location
 OPENSSL_CNF="/etc/pki/tls/openssl.cnf"
