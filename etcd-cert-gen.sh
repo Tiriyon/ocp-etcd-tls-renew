@@ -1,11 +1,11 @@
 #!/bin/bash
 
 # Define paths for CA certificates and their keys
-# TODO - export var from signer extrator script to populate paths
-ETCD_SIGNER_CERT="/etc/kubernetes/etcd-certs-backup-20240421/etcd-signer.crt"
-ETCD_SIGNER_KEY="/etc/kubernetes/etcd-certs-backup-20240421/etcd-signer.key"
-ETCD_METRIC_SIGNER_CERT="/etc/kubernetes/etcd-certs-backup-20240421/etcd-metric-signer.crt"
-ETCD_METRIC_SIGNER_KEY="/etc/kubernetes/etcd-certs-backup-20240421/etcd-metric-signer.key"
+read -r signers_dir < "exported_vars.env" 
+ETCD_SIGNER_CERT="./$signers_dir/etcd-signer.crt"
+ETCD_SIGNER_KEY="./$singers_dir/etcd-signer.key"
+ETCD_METRIC_SIGNER_CERT="./$signers_dir/etcd-metric-signer.crt"
+ETCD_METRIC_SIGNER_KEY="./$signers_dir/etcd-metric-signer.key"
 
 # Define the OpenSSL config file location
 OPENSSL_CNF="/etc/pki/tls/openssl.cnf"

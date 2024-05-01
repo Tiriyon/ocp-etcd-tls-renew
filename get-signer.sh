@@ -27,4 +27,8 @@ for signer in "${signers[@]}"; do
   scp -i ./cluster-key "$ssh_user@$master_ip:$remote_root_certs_dir/$signer.key" "$local_root_certs_dir/$signer.key"
 done
 
+# Exporting variables for use in etcd-cert-gen.sh script
+
+echo "etcd_signers_dir=\"$local_root_certs_dir\"" > exported_vars.env
+
 echo "Extraction and transfer process completed. Check $local_root_certs_dir for certificates and keys with validation script"
