@@ -64,5 +64,6 @@ while IFS=' ' read -r hostname ip_address <&3; do
     backup_and_verify_manifests "$ip_address"
     stop_and_verify_control_plane "$ip_address"
 done
+exec 3<&-
 
 echo "Control plane stoppage and verification completed for all specified nodes."
