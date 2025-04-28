@@ -30,7 +30,7 @@ extract_and_format_details() {
 # Loop through each type of certificates
 for type in peer serving serving-metrics; do
     original_dir="${original_dir_prefix}-${type}"
-    new_dir="${new_dir_prefix}/${type}"
+    new_dir="${new_dir_prefix}/etcd-all-${type}"
     echo "$new_dir $original_dir"
     # Ensure directory exists
     if [[ ! -d "$original_dir" || ! -d "$new_dir" ]]; then
