@@ -3,9 +3,9 @@
 cluster_key="cluster-key"
 
 # Define local directories
-local_peer_dir="./new-certs/peer"
-local_serving_dir="./new-certs/serving"
-local_serving_metrics_dir="./new-certs/serving-metrics"
+local_peer_dir="./new-certs/etcd-all-peer"
+local_serving_dir="./new-certs/etcd-all-serving"
+local_serving_metrics_dir="./new-certs/etcd-all-serving-metrics"
 
 # Define remote directories
 remote_peer_dir="/etc/kubernetes/static-pod-resources/etcd-certs/secrets/etcd-all-peer"
