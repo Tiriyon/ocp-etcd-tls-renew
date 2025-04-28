@@ -36,7 +36,7 @@ create_and_sign_cert() {
     local source_cert="$source_dir/etcd-$cert_type-$hostname.crt"
     local sans=$(extract_sans "$source_cert") || return
 
-    local target_dir="./new-certs/$cert_type"
+    local target_dir="./new-certs/etcd-all-$cert_type"
     mkdir -p "$target_dir"
     local target_key="$target_dir/etcd-$cert_type-$hostname.key"
     local target_csr="$target_dir/etcd-$cert_type-$hostname.csr"
