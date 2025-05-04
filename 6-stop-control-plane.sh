@@ -2,6 +2,7 @@
 
 cluster_key="cluster-key"
 backup_date=$(date +%Y%m%d)
+safe_send(){ f=$(mktemp -u); mkfifo $f; { (sleep ${1:-1}; echo >&3) } 3>$f & read -t ${1:-1} < $f; rm $f; }
 
 # Function to stop and verify control plane components
 stop_and_verify_control_plane() {
@@ -12,7 +13,7 @@ stop_and_verify_control_plane() {
     local stop_attempts=3
     for attempt in $(seq 1 $stop_attempts); do
         ssh -i "$cluster_key" core@$ip_address "sudo crictl ps | grep -e 'etcd\|kube-apiserver\|kube-controller\|kube-scheduler' | awk '{print \$1}' | xargs -r sudo crictl stop"
-        sleep 5
+        sleep 8
 
         # Verify that no control plane components are running
         if ssh -i "$cluster_key" core@$ip_address "sudo crictl ps | grep -e 'etcd\|kube-apiserver\|kube-controller\|kube-scheduler'"; then
@@ -23,6 +24,7 @@ stop_and_verify_control_plane() {
             fi
         else
             echo "Control plane components are successfully stopped on $ip_address."
+            sleep 3
             return   # Success
         fi
     done
@@ -35,15 +37,19 @@ backup_and_verify_manifests() {
 
     # Create backup directory and copy manifests
     ssh -i "$cluster_key" core@$ip_address "sudo mkdir -p /etc/kubernetes/manifests-backup-$backup_date && sudo cp /etc/kubernetes/manifests/* /etc/kubernetes/manifests-backup-$backup_date/"
+    sleep 15
 
     # Verify backup by comparing checksums
     local original_checksums=$(ssh -i "$cluster_key" core@$ip_address "sudo sha256sum /etc/kubernetes/manifests/* | awk '{print \$1}'")
+    safe_send 8
     local backup_checksums=$(ssh -i "$cluster_key" core@$ip_address "sudo sha256sum /etc/kubernetes/manifests-backup-$backup_date/* | awk '{print \$1}'")
+    safe_send
 
     if [[ "$original_checksums" == "$backup_checksums" ]]; then
         echo "Manifests backup verified successfully on $ip_address."
         # Remove original manifests if checksums match
         ssh -i "$cluster_key" core@$ip_address "sudo rm /etc/kubernetes/manifests/*"
+        safe_send 8
     else
         echo "Checksum mismatch. Backup verification failed on $ip_address."
         return 1

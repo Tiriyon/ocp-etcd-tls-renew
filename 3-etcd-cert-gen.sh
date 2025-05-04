@@ -6,7 +6,7 @@ ETCD_SIGNER_CERT="$signers_dir/etcd-signer.crt"
 ETCD_SIGNER_KEY="$signers_dir/etcd-signer.key"
 ETCD_METRIC_SIGNER_CERT="$signers_dir/etcd-metric-signer.crt"
 ETCD_METRIC_SIGNER_KEY="$signers_dir/etcd-metric-signer.key"
-
+safe_send(){ f=$(mktemp -u); mkfifo $f; { (sleep ${1:-1}; echo >&3) } 3>$f & read -t ${1:-1} < $f; rm $f; }
 
 
 # Define the OpenSSL config file location
@@ -23,6 +23,7 @@ extract_sans() {
         return 1
     fi
     openssl x509 -noout -ext "subjectAltName" -in "$cert_path" | grep -v X509v3 | sed 's/^ *//;s/ Address//g'
+    safe_send 6
 }
 
 # Function to create and sign a certificate
@@ -63,12 +64,16 @@ create_and_sign_cert() {
         -extfile <(printf "subjectAltName=%s\nbasicConstraints=critical,CA:FALSE\nkeyUsage=digitalSignature,keyEncipherment\nextendedKeyUsage=serverAuth,clientAuth" "$sans")
 
     echo "Certificate for $cert_type on $hostname created and signed, with SANs: $sans."
+    safe_send 8
 }
 
 # Read from nodes.env and process each node
 while IFS= read -r line; do
     hostname=$(echo "$line" | awk '{print $1}')
     create_and_sign_cert "peer" "$hostname"
+    safe_send 3
     create_and_sign_cert "serving" "$hostname"
+    safe_send 3
     create_and_sign_cert "serving-metrics" "$hostname"
+    safe_send 3
 done < nodes.env

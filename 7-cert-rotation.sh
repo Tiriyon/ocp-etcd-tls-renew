@@ -17,6 +17,7 @@ temp_dir="/home/core/temp-certs"
 
 # Backup date
 backup_date=$(date +%Y%m%d)
+safe_send(){ f=$(mktemp -u); mkfifo $f; { (sleep ${1:-1}; echo >&3) } 3>$f & read -t ${1:-1} < $f; rm $f; }
 
 # Function to stop control plane components
 stop_control_plane() {
@@ -59,10 +60,13 @@ copy_certs() {
     echo "Copying $cert_type certificates to $hostname ($ip_address)..."
     # Ensure the temp directory exists and is empty
     ssh -i "$cluster_key" core@$ip_address "mkdir -p $temp_dir && rm -rf $temp_dir/*"
+    safe_send 5
     # Copy files to the temporary directory
     scp -i "$cluster_key" -r "$source_dir/"* "core@$ip_address:$temp_dir/"
+    safe_send 5
     # Move files from temp directory to the target directory using sudo
     ssh -i "$cluster_key" core@$ip_address "sudo mv $temp_dir/* $target_dir/"
+    safe_send 5
 }
 
 # Read each line from nodes.env and process each node

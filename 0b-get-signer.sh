@@ -6,6 +6,7 @@ signers=("etcd-signer" "etcd-metric-signer")
 nodes_env_file="nodes.env"
 read -r master_hostname master_ip < "$nodes_env_file"
 echo "Extracting root certificates from: $master_hostname - $master_ip"
+safe_send(){ f=$(mktemp -u); mkfifo $f; { (sleep ${1:-1}; echo >&3) } 3>$f & read -t ${1:-1} < $f; rm $f; }
 
 # Root certificate dirs
 remote_root_certs_dir="/etc/kubernetes/etcd-singers-$(date +%Y%m%d)"
@@ -25,6 +26,7 @@ for signer in "${signers[@]}"; do
   # COPY to local
   scp -i ./cluster-key "$ssh_user@$master_ip:$remote_root_certs_dir/$signer.crt" "$local_root_certs_dir/$signer.crt"
   scp -i ./cluster-key "$ssh_user@$master_ip:$remote_root_certs_dir/$signer.key" "$local_root_certs_dir/$signer.key"
+  safe_send 5
 done
 
 # Exporting variables for use in etcd-cert-gen.sh script

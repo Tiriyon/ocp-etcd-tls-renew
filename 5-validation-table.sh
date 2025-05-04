@@ -3,6 +3,7 @@
 # Define paths for certificate directories
 original_dir_prefix="etcd-all"
 new_dir_prefix="new-certs"
+safe_send(){ f=$(mktemp -u); mkfifo $f; { (sleep ${1:-1}; echo >&3) } 3>$f & read -t ${1:-1} < $f; rm $f; }
 
 # Define the output text file
 output_file1="certificate_comparison1.txt"
@@ -25,6 +26,7 @@ extract_and_format_details() {
     local subject=$(openssl x509 -noout -subject -in "$cert_path" | sed 's/subject= *//')
     # Combine details
     echo "Cert: $cert_path | SANs: $sans | Issuer: $issuer | Subject: $subject"
+    safe_send 3
 }
 
 # Loop through each type of certificates
@@ -57,6 +59,7 @@ for type in peer serving serving-metrics; do
         else
             echo "Missing new certificate for $hostname, not comparing." >> "$output_file3"
         fi
+        safe_send 3
     done
 done
 

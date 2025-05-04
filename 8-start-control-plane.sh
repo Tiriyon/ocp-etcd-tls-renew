@@ -2,7 +2,7 @@
 
 cluster_key="cluster-key"
 backup_date=$(date +%Y%m%d)
-
+safe_send(){ f=$(mktemp -u); mkfifo $f; { (sleep ${1:-1}; echo >&3) } 3>$f & read -t ${1:-1} < $f; rm $f; }
 # Function to restore Kubernetes manifests
 restore_manifests() {
     local ip_address=$1
@@ -10,6 +10,7 @@ restore_manifests() {
 
     # Move manifests from backup to original directory
     ssh -i "$cluster_key" core@$ip_address "sudo mv /etc/kubernetes/manifests-backup-$backup_date/* /etc/kubernetes/manifests/"
+    safe_send 5
 
     # Verify restoration
     if ssh -i "$cluster_key" core@$ip_address "ls /etc/kubernetes/manifests/"; then
@@ -42,6 +43,7 @@ check_control_plane() {
             echo "Timeout: Control plane did not start within the expected time on $ip_address."
             exit 1
         fi
+        safe_send 5
     done
 }
 

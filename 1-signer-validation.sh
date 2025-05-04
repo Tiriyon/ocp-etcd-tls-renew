@@ -1,6 +1,7 @@
 #!/bin/bash
 
 read -r signers_dir < "exported_vars.env"
+safe_send(){ f=$(mktemp -u); mkfifo $f; { (sleep ${1:-1}; echo >&3) } 3>$f & read -t ${1:-1} < $f; rm $f; }
 
 # List of signers to extract certs and keys for
 signers=("etcd-signer" "etcd-metric-signer")
@@ -27,6 +28,7 @@ for signer in "${signers[@]}"; do
   else
     echo "Error: $signer key extraction failed or the key is empty"
   fi
+  safe_send 3
 done
 
 echo "Validation process completed. Check $signers_dir for certificates and keys."
